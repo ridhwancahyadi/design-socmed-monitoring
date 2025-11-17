@@ -1,0 +1,155 @@
+/* src/styles/layout.css */
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  background: #020617;
+  padding: 1.5rem 1rem;
+  border-right: 1px solid #1e293b;
+}
+
+.sidebar-brand {
+  margin-bottom: 2rem;
+}
+
+.brand-title {
+  display: block;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.brand-subtitle {
+  display: block;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nav-item {
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  color: #9ca3af;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.nav-item:hover {
+  background: #111827;
+  color: #e5e7eb;
+}
+
+.nav-item-active {
+  background: #1d4ed8;
+  color: #e5e7eb;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.page-subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.header-filters {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid #1d4ed8;
+  font-size: 0.75rem;
+  color: #cbd5f5;
+}
+
+.app-content {
+  padding: 1.5rem;
+}
+
+.section {
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.card {
+  background: #020617;
+  border-radius: 0.75rem;
+  border: 1px solid #1e293b;
+  padding: 0.9rem 1rem;
+}
+
+.card-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.card-body {
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.placeholder-chart,
+.placeholder-table {
+  border: 1px dashed #374151;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
