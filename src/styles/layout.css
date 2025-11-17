@@ -153,3 +153,120 @@ body {
   font-size: 0.8rem;
   color: #6b7280;
 }
+
+
+.feed-table-wrapper {
+  max-height: 320px;
+  overflow: auto;
+}
+
+.feed-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.feed-table th,
+.feed-table td {
+  border-bottom: 1px solid #1e293b;
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+}
+
+.feed-table th {
+  position: sticky;
+  top: 0;
+  background: #020617;
+  z-index: 1;
+}
+
+.feed-text {
+  max-width: 260px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.risk-badge {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+}
+
+.risk-badge.badge-low {
+  background: #064e3b;
+  color: #bbf7d0;
+}
+.risk-badge.badge-medium {
+  background: #f59e0b33;
+  color: #fbbf24;
+}
+.risk-badge.badge-high {
+  background: #b91c1c33;
+  color: #fecaca;
+}
+.risk-badge.badge-critical {
+  background: #7f1d1d;
+  color: #fee2e2;
+}
+
+.flag-badge {
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  border-radius: 999px;
+  background: #1e293b;
+  color: #cbd5f5;
+  font-size: 0.7rem;
+  margin-right: 0.25rem;
+}
+
+.section-filters .filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.filter-group label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.filter-group select {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  color: #e5e7eb;
+  font-size: 0.8rem;
+}
+
+.kpi-label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.kpi-value {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-top: 0.2rem;
+}
+
+.kpi-sub {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 0.1rem;
+}
+
+.card-footnote {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
