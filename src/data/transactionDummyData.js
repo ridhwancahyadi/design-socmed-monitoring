@@ -40,6 +40,8 @@ export const logisticsCoverageData = [
 ]
 
 // Flow asal–tujuan (dummy, seolah-olah diekstrak dari pattern kirim)
+// src/data/transactionDummyData.js
+
 export const routeFlowData = {
   nodes: [
     { name: "Jakarta" },
@@ -49,14 +51,22 @@ export const routeFlowData = {
     { name: "Jawa Timur" },
   ],
   links: [
+    // Jakarta sebagai sumber utama
     { source: "Jakarta", target: "Bandung", value: 12 },
     { source: "Jakarta", target: "Jawa Tengah", value: 16 },
     { source: "Jakarta", target: "Jawa Timur", value: 10 },
-    { source: "Bandung", target: "Jakarta", value: 8 },
+
+    // Bandung distribusi lanjut, tapi tidak balik lagi ke Jakarta
+    { source: "Bandung", target: "Jawa Tengah", value: 8 },
+
+    // Surabaya → Jawa Timur
     { source: "Surabaya", target: "Jawa Timur", value: 14 },
+
+    // Jawa Tengah → Jawa Timur (lanjutan distribusi)
     { source: "Jawa Tengah", target: "Jawa Timur", value: 9 },
   ],
 }
+
 
 // Anomali aktivitas transaksi per hari
 export const anomalyData = [

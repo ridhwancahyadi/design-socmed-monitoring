@@ -1,4 +1,3 @@
-// src/components/charts/RouteSankeyChart.jsx
 import React from "react"
 import ReactECharts from "echarts-for-react"
 
@@ -10,13 +9,18 @@ const RouteSankeyChart = ({ data }) => {
         type: "sankey",
         data: data.nodes,
         links: data.links,
+        nodeAlign: "left",       // semua origin start dari kiri
+        nodeWidth: 18,
+        nodeGap: 16,
+        layoutIterations: 32,
         emphasis: { focus: "adjacency" },
         lineStyle: {
-          color: "gradient",
-          curveness: 0.5,
+          opacity: 0.5,
+          curveness: 0.4,
         },
         label: {
           color: "#e5e7eb",
+          fontSize: 10,
         },
       },
     ],
