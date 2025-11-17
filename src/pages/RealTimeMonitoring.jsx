@@ -5,8 +5,7 @@ import RoleDistributionChart from "../components/charts/RoleDistributionChart"
 import RiskDistributionChart from "../components/charts/RiskDistributionChart"
 import PlatformRoleChart from "../components/charts/PlatformRoleChart"
 import KeywordBarChart from "../components/charts/KeywordBarChart"
-import RealtimeFeedTable from "../components/RealtimeFeedTable"
-
+import RealtimeFeedTable from "../components/FeedTable"
 import {
   conversationVolumeData,
   roleDistributionData,

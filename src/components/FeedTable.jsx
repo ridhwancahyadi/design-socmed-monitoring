@@ -1,4 +1,3 @@
-// src/components/RealtimeFeedTable.jsx
 import React from "react"
 
 const riskColorClass = (level) => {
