@@ -1,117 +1,146 @@
 // src/data/realtimeDummyData.js
 
-// 4 roles utama
-export const CONTENT_ROLES = [
-  "Marketing Awareness",
-  "Product Evidence",
-  "Logistics Operation",
-  "Narrative Influence",
-]
+export const realtimeKpiData = {
+  totalPosts: 24847,
+  highRiskPosts: 342,
+  activeHighRiskAccounts: 89,
+  youthPercentage: 67.8,
+  highRiskCities: 12,
+};
 
-// 1) Time-series volume per role (misal per jam)
-export const conversationVolumeData = {
-  timestamps: ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00"],
-  marketingAwareness: [20, 32, 28, 40, 35, 30],
-  productEvidence: [12, 18, 15, 22, 20, 19],
-  logisticsOperation: [5, 7, 6, 9, 11, 10],
-  narrativeInfluence: [10, 14, 18, 25, 24, 22],
-}
+export const realtimeTimeSeriesData = [
+  { time: '00:00', exposure: 3200, velocity: 45 },
+  { time: '04:00', exposure: 2100, velocity: 28 },
+  { time: '08:00', exposure: 5600, velocity: 78 },
+  { time: '12:00', exposure: 8900, velocity: 124 },
+  { time: '16:00', exposure: 7200, velocity: 98 },
+  { time: '20:00', exposure: 9500, velocity: 145 },
+  { time: '23:59', exposure: 6800, velocity: 89 },
+];
 
-// 2) Distribution per role (snapshot)
-export const roleDistributionData = [
-  { role: "Marketing Awareness", value: 155 },
-  { role: "Product Evidence", value: 106 },
-  { role: "Logistics Operation", value: 48 },
-  { role: "Narrative Influence", value: 113 },
-]
+export const realtimeKeywordData = [
+  { keyword: 'ganja premium', count: 234, risk: 'high' },
+  { keyword: 'cod tersedia', count: 189, risk: 'high' },
+  { keyword: 'ready stok', count: 167, risk: 'medium' },
+  { keyword: 'dm for price', count: 145, risk: 'high' },
+  { keyword: 'plug terpercaya', count: 128, risk: 'high' },
+];
 
-// 3) Risk level distribution (per posting)
-export const riskDistributionData = [
-  { level: "Low", value: 120 },
-  { level: "Medium", value: 90 },
-  { level: "High", value: 55 },
-  { level: "Critical", value: 18 },
-]
+export const realtimeHashtagData = [
+  { tag: '#420friendly', count: 567 },
+  { tag: '#pluglife', count: 423 },
+  { tag: '#cannabisindo', count: 389 },
+  { tag: '#readystok', count: 312 },
+  { tag: '#fastresponse', count: 289 },
+];
 
-// 4) Platform × role (stacked bar)
-export const platformRoleData = [
-  {
-    platform: "Instagram",
-    marketingAwareness: 80,
-    productEvidence: 60,
-    logisticsOperation: 15,
-    narrativeInfluence: 30,
-  },
-  {
-    platform: "TikTok",
-    marketingAwareness: 45,
-    productEvidence: 25,
-    logisticsOperation: 10,
-    narrativeInfluence: 60,
-  },
-  {
-    platform: "X",
-    marketingAwareness: 30,
-    productEvidence: 12,
-    logisticsOperation: 18,
-    narrativeInfluence: 20,
-  },
-]
+export const realtimeEmotionData = [
+  { emotion: 'Netral', value: 45, color: '#6B7280' },
+  { emotion: 'Positif', value: 32, color: '#10B981' },
+  { emotion: 'Negatif', value: 15, color: '#EF4444' },
+  { emotion: 'Promosi', value: 8, color: '#F59E0B' },
+];
 
-// 5) Top keywords / coded language
-export const keywordData = [
-  { term: "#party", count: 34, type: "explicit" },
-  { term: "vitaminX", count: 27, type: "coded" },
-  { term: "malam-malam", count: 22, type: "coded" },
-  { term: "#healing", count: 19, type: "explicit" },
-  { term: "paket hemat", count: 16, type: "coded" },
-  { term: "ready stock", count: 13, type: "explicit" },
-]
+export const realtimePlatformData = [
+  { platform: 'Instagram', posts: 8942, stories: 3421, reels: 2134 },
+  { platform: 'TikTok', posts: 7823, stories: 0, reels: 5621 },
+  { platform: 'Twitter/X', posts: 4532, stories: 0, reels: 0 },
+  { platform: 'Facebook', posts: 2341, stories: 891, reels: 456 },
+  { platform: 'Telegram', posts: 1209, stories: 0, reels: 0 },
+];
 
-// 6) Real-time feed dummy
-export const realtimeFeedData = [
+export const realtimeGeoData = [
+  { city: 'Jakarta', count: 4521, risk: 92 },
+  { city: 'Surabaya', count: 2834, risk: 78 },
+  { city: 'Bandung', count: 2145, risk: 85 },
+  { city: 'Medan', count: 1867, risk: 71 },
+  { city: 'Bekasi', count: 1543, risk: 68 },
+  { city: 'Tangerang', count: 1432, risk: 73 },
+  { city: 'Depok', count: 1289, risk: 65 },
+  { city: 'Semarang', count: 1156, risk: 62 },
+];
+
+export const realtimeYouthData = [
+  { category: 'Remaja (13-17)', value: 34, color: '#8B5CF6' },
+  { category: 'Dewasa Muda (18-25)', value: 43, color: '#EC4899' },
+  { category: 'Dewasa (26-35)', value: 18, color: '#F59E0B' },
+  { category: 'Lainnya', value: 5, color: '#6B7280' },
+];
+
+export const realtimeContentFeed = [
   {
-    id: "1",
-    timestamp: "2025-11-17 13:42",
-    platform: "Instagram",
-    region: "Jakarta",
-    account: "@userA",
-    role: "Marketing Awareness",
-    riskLevel: "Medium",
-    text: "Diskon varian terbaru malam ini, DM untuk info lengkap.",
-    flags: ["transaction_hint"],
+    id: 1,
+    time: '2 menit lalu',
+    platform: 'Instagram',
+    account: '@user_***23',
+    text: 'Ready stok premium quality, dm for price list. Fast response 24/7 #plug #ready',
+    riskScore: 94,
+    role: 'Distributor',
+    thumbnail: '📸',
   },
   {
-    id: "2",
-    timestamp: "2025-11-17 13:38",
-    platform: "TikTok",
-    region: "Bandung",
-    account: "@genZparty",
-    role: "Narrative Influence",
-    riskLevel: "High",
-    text: "Kemarin malam vibes-nya parah sih, bikin melayang 🤯",
-    flags: ["youth_segment", "coded_language"],
+    id: 2,
+    time: '5 menit lalu',
+    platform: 'TikTok',
+    account: '@dealer_***45',
+    text: 'COD Jakarta area, trusted seller since 2020. Check bio for contact',
+    riskScore: 89,
+    role: 'Seller',
+    thumbnail: '🎥',
   },
   {
-    id: "3",
-    timestamp: "2025-11-17 13:30",
-    platform: "X",
-    region: "Surabaya",
-    account: "@logistikX",
-    role: "Logistics Operation",
-    riskLevel: "High",
-    text: "Pengiriman ready dari SBY ke area Jawa Timur, chat aja.",
-    flags: ["transaction_hint"],
+    id: 3,
+    time: '8 menit lalu',
+    platform: 'Telegram',
+    account: '@plug_***67',
+    text: 'New batch arrived. Quality guaranteed. Delivery available all area',
+    riskScore: 96,
+    role: 'Supplier',
+    thumbnail: '💬',
   },
   {
-    id: "4",
-    timestamp: "2025-11-17 13:25",
-    platform: "Instagram",
-    region: "Yogyakarta",
-    account: "@testimoni_store",
-    role: "Product Evidence",
-    riskLevel: "Medium",
-    text: "Kemarin pesen paket di sini, aman dan cepat.",
-    flags: ["testimonial"],
+    id: 4,
+    time: '12 menit lalu',
+    platform: 'Twitter/X',
+    account: '@***_indo89',
+    text: 'Looking for reliable plug in Bandung area. Please dm recommendations',
+    riskScore: 67,
+    role: 'Buyer',
+    thumbnail: '🐦',
   },
-]
+  {
+    id: 5,
+    time: '15 menit lalu',
+    platform: 'Instagram',
+    account: '@green_***12',
+    text: 'Best quality in town. Testimoni available. Safe transaction guaranteed',
+    riskScore: 91,
+    role: 'Distributor',
+    thumbnail: '📸',
+  },
+  {
+    id: 6,
+    time: '18 menit lalu',
+    platform: 'TikTok',
+    account: '@***_supply',
+    text: 'Limited stock! Order now before its gone. Special price today only',
+    riskScore: 88,
+    role: 'Seller',
+    thumbnail: '🎥',
+  },
+];
+
+export const realtimeCodedLanguageData = [
+  { code: '🌿 + 💵', meaning: 'Ganja + Harga', frequency: 234 },
+  { code: '❄️', meaning: 'Sabu/Methamphetamine', frequency: 189 },
+  { code: '🔌', meaning: 'Supplier/Dealer', frequency: 167 },
+  { code: '🚀', meaning: 'Pengiriman Cepat', frequency: 145 },
+  { code: '🔥', meaning: 'Stok Baru/Premium', frequency: 128 },
+];
+
+export const realtimeRiskLevelData = [
+  { level: 'Critical', value: 342, color: '#DC2626' },
+  { level: 'High', value: 789, color: '#F59E0B' },
+  { level: 'Medium', value: 1456, color: '#FBBF24' },
+  { level: 'Low', value: 3234, color: '#10B981' },
+];

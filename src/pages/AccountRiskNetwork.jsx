@@ -1,155 +1,267 @@
 // src/pages/AccountRiskNetwork.jsx
-import React from "react"
-import AccountRiskLevelChart from "../components/charts/AccountRiskLevelChart"
-import RiskScoreTrendChart from "../components/charts/RiskScoreTrendChart"
-import AccountNetworkGraph from "../components/charts/AccountNetworkGraph"
-import ClusterRiskChart from "../components/charts/ClusterRiskChart"
-import HighRiskAccountsTable from "../components/HighRiskAccountsTable"
+import React, { useState, useMemo } from 'react';
+import { generateAccountData } from '../data/accountRiskDummyData';
+import RiskDistributionCards from '../components/account-risk/RiskDistributionCards';
+import AccountSearchFilters from '../components/account-risk/AccountSearchFilters';
+import HighRiskAccountsTable from '../components/account-risk/HighRiskAccountsTable';
+import AccountDetailPanel from '../components/account-risk/AccountDetailPanel';
+import NetworkOverview from '../components/account-risk/NetworkOverview';
 
-import {
-  accountRiskLevelData,
-  riskScoreTrendData,
-  networkGraphData,
-  clusterData,
-  highRiskAccounts,
-} from "../data/accountRiskDummyData"
+// NEW: import analytics section
+import NetworkAnalyticsSection from '../components/network/NetworkAnalyticsSection';
+
+// Helper: bentuk network nodes + clusters dari accounts
+const buildNetworkFromAccounts = (accounts) => {
+  if (!accounts.length) {
+    return { nodes: [], clusters: [] };
+  }
+
+  // Bentuk nodes dengan metric network sintetis
+  const nodes = accounts.map((acc, index) => {
+    const degree = Math.floor(Math.random() * 10) + 1;
+    return {
+      id: acc.id ?? index + 1,
+      username: acc.username,
+      role: acc.networkRole || acc.dominantRole || 'Reseller',
+      platform: acc.platform,
+      province: acc.region,   // untuk sekarang anggap region sebagai province
+      city: acc.region,
+      riskLevel: acc.riskLevel,
+      riskScore: acc.riskScore,
+      degree,
+      betweenness: Math.random() * 10,
+      eigenvector: Math.random(),
+      cluster: (index % 5) + 1,
+    };
+  });
+
+  // Hitung cluster aggregate
+  const clusterMap = new Map();
+  nodes.forEach((node) => {
+    if (!clusterMap.has(node.cluster)) {
+      clusterMap.set(node.cluster, {
+        id: node.cluster,
+        size: 0,
+        members: [],
+        leader: null,
+        avgRisk: 0,
+        province: node.province,
+      });
+    }
+    const cluster = clusterMap.get(node.cluster);
+    cluster.size += 1;
+    cluster.members.push(node.id);
+    cluster.avgRisk += node.riskScore;
+  });
+
+  const clusters = Array.from(clusterMap.values()).map((cluster) => {
+    cluster.avgRisk = cluster.size ? cluster.avgRisk / cluster.size : 0;
+    // pilih leader: degree tertinggi di cluster
+    const leaderId = cluster.members.reduce((leaderId, memberId) => {
+      const member = nodes.find((n) => n.id === memberId);
+      const currentLeader = nodes.find((n) => n.id === leaderId);
+      if (!currentLeader) return memberId;
+      return member.degree > currentLeader.degree ? memberId : leaderId;
+    }, cluster.members[0]);
+    cluster.leader = leaderId;
+    return cluster;
+  });
+
+  return { nodes, clusters };
+};
 
 const AccountRiskNetwork = () => {
-  const totalAccounts = accountRiskLevelData.reduce(
-    (sum, r) => sum + r.value,
-    0
-  )
-  const highCriticalAccounts = accountRiskLevelData
-    .filter((r) => r.level === "High" || r.level === "Critical")
-    .reduce((sum, r) => sum + r.value, 0)
+  const [selectedAccount, setSelectedAccount] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterRisk, setFilterRisk] = useState('all');
+  const [filterPlatform, setFilterPlatform] = useState('all');
 
-  const latestAvgRisk =
-    riskScoreTrendData.avgRiskScores[
-      riskScoreTrendData.avgRiskScores.length - 1
-    ]
-  const earliestAvgRisk = riskScoreTrendData.avgRiskScores[0]
-  const riskDrift = latestAvgRisk - earliestAvgRisk
+  // Dummy data hanya dibuat sekali
+  const accounts = useMemo(() => generateAccountData(50), []);
 
-  const highestCluster = clusterData.reduce(
-    (max, c) => (c.avgRiskScore > max.avgRiskScore ? c : max),
-    clusterData[0]
-  )
+  // Distribusi risk
+  const riskDistribution = useMemo(() => {
+    const dist = { low: 0, medium: 0, high: 0, critical: 0 };
+    accounts.forEach((acc) => {
+      if (dist[acc.riskLevel] !== undefined) {
+        dist[acc.riskLevel]++;
+      }
+    });
+    return dist;
+  }, [accounts]);
+
+  // Filter utama
+  const filteredAccounts = useMemo(() => {
+    return accounts
+      .filter((acc) => {
+        const term = searchTerm.toLowerCase();
+        const matchSearch =
+          !term ||
+          acc.username.toLowerCase().includes(term) ||
+          acc.region.toLowerCase().includes(term);
+        const matchRisk = filterRisk === 'all' || acc.riskLevel === filterRisk;
+        const matchPlatform =
+          filterPlatform === 'all' || acc.platform === filterPlatform;
+        return matchSearch && matchRisk && matchPlatform;
+      })
+      .sort((a, b) => b.riskScore - a.riskScore);
+  }, [accounts, searchTerm, filterRisk, filterPlatform]);
+
+  const highRiskAccounts = useMemo(
+    () => filteredAccounts.slice(0, 20),
+    [filteredAccounts]
+  );
+
+  const hasActiveFilter =
+    filterRisk !== 'all' || filterPlatform !== 'all' || searchTerm !== '';
+
+  const handleClearFilters = () => {
+    setFilterRisk('all');
+    setFilterPlatform('all');
+    setSearchTerm('');
+  };
+
+  // === NEW: bentuk network metrics dari filtered accounts ===
+  const { nodes: networkNodes, clusters } = useMemo(
+    () => buildNetworkFromAccounts(filteredAccounts),
+    [filteredAccounts]
+  );
+
+  // Sinkron: klik chart → pilih account di detail
+  const handleSelectNetworkNode = (node) => {
+    const acc = filteredAccounts.find(
+      (a) => a.username === node.username
+    );
+    if (acc) {
+      setSelectedAccount(acc);
+    }
+  };
 
   return (
-    <div className="page">
-      {/* KPI Ringkas */}
-      <section className="section">
-        <h2 className="section-title">Account Risk Overview</h2>
-        <div className="grid grid-4">
-          <div className="card">
-            <div className="kpi-label">Accounts Monitored</div>
-            <div className="kpi-value">{totalAccounts}</div>
-            <div className="kpi-sub">across current filters</div>
-          </div>
+    <div
+      style={{
+        background: 'linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%)',
+        minHeight: '100vh',
+        color: '#fff',
+        fontFamily: 'Inter, system-ui, sans-serif',
+        padding: '20px',
+      }}
+    >
+      {/* Header */}
+      <div style={{ marginBottom: '30px' }}>
+        <h1
+          style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            background: 'linear-gradient(90deg, #00ff88 0%, #00d4ff 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            marginBottom: '10px',
+          }}
+        >
+          Account Risk & Network Intelligence
+        </h1>
+        <p style={{ color: '#888', fontSize: '14px' }}>
+          Tactical X BNN - Digital Intelligence & Social Media Monitoring
+        </p>
+      </div>
 
-          <div className="card">
-            <div className="kpi-label">High & Critical Accounts</div>
-            <div className="kpi-value">{highCriticalAccounts}</div>
-            <div className="kpi-sub">
-              {(highCriticalAccounts / (totalAccounts || 1) * 100).toFixed(1)}%
-              of monitored accounts
-            </div>
-          </div>
+      {/* Risk Cards */}
+      <RiskDistributionCards
+        riskDistribution={riskDistribution}
+        currentFilter={filterRisk}
+        onChangeFilter={setFilterRisk}
+      />
 
-          <div className="card">
-            <div className="kpi-label">Risk Drift (7d)</div>
-            <div className="kpi-value">
-              {riskDrift >= 0 ? "+" : ""}
-              {riskDrift.toFixed(1)}
-            </div>
-            <div className="kpi-sub">
-              change in avg risk score vs last week
-            </div>
-          </div>
+      {/* Search & Filters */}
+      <AccountSearchFilters
+        searchTerm={searchTerm}
+        onChangeSearch={setSearchTerm}
+        filterPlatform={filterPlatform}
+        onChangePlatform={setFilterPlatform}
+        hasActiveFilter={hasActiveFilter}
+        onClearFilters={handleClearFilters}
+      />
 
-          <div className="card">
-            <div className="kpi-label">Most Critical Cluster</div>
-            <div className="kpi-value text-sm">{highestCluster.name}</div>
-            <div className="kpi-sub">
-              Avg risk {highestCluster.avgRiskScore} ·{" "}
-              {highestCluster.accountCount} accounts
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Main Grid */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: selectedAccount ? '1fr 1fr' : '1fr',
+          gap: '20px',
+        }}
+      >
+        <HighRiskAccountsTable
+          accounts={highRiskAccounts}
+          filteredTotal={filteredAccounts.length}
+          currentRiskFilter={filterRisk}
+          selectedAccountId={selectedAccount?.id ?? null}
+          onSelectAccount={setSelectedAccount}
+        />
 
-      {/* Distribusi & Tren */}
-      <section className="section">
-        <div className="grid grid-2">
-          <div className="card">
-            <h3 className="card-title">Risk Level Distribution (Accounts)</h3>
-            <div className="card-body">
-              <AccountRiskLevelChart data={accountRiskLevelData} />
-            </div>
-          </div>
+        {selectedAccount ? (
+          <AccountDetailPanel
+            account={selectedAccount}
+            onClose={() => setSelectedAccount(null)}
+          />
+        ) : (
+          <NetworkOverview
+            accounts={filteredAccounts}
+            riskDistribution={riskDistribution}
+            onSelectAccount={setSelectedAccount}
+          />
+        )}
+      </div>
 
-          <div className="card">
-            <h3 className="card-title">Average Risk Score Trend</h3>
-            <div className="card-body">
-              <RiskScoreTrendChart data={riskScoreTrendData} />
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* NEW: Network Analytics Charts (pakai chart dari page sebelumnya) */}
+      <NetworkAnalyticsSection
+        nodes={networkNodes}
+        clusters={clusters}
+        onSelectNode={handleSelectNetworkNode}
+      />
 
-      {/* Network Graph & High-Risk List */}
-      <section className="section">
-        <div className="grid grid-2">
-          <div className="card">
-            <h3 className="card-title">Risk Network Graph</h3>
-            <div className="card-body">
-              <AccountNetworkGraph data={networkGraphData} />
-            </div>
-          </div>
-
-          <div className="card">
-            <h3 className="card-title">Priority High-Risk Accounts</h3>
-            <div className="card-body">
-              <HighRiskAccountsTable rows={highRiskAccounts} />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Cluster Risk Insight */}
-      <section className="section">
-        <div className="grid grid-2">
-          <div className="card">
-            <h3 className="card-title">Cluster Risk Profile</h3>
-            <div className="card-body">
-              <ClusterRiskChart data={clusterData} />
-            </div>
-          </div>
-
-          <div className="card">
-            <h3 className="card-title">Cluster Summary</h3>
-            <div className="card-body">
-              <ul className="text-sm space-y-3">
-                {clusterData.map((c) => (
-                  <li key={c.id}>
-                    <div className="font-semibold">{c.name}</div>
-                    <div className="text-xs text-slate-400">
-                      Accounts: {c.accountCount} · Avg risk{" "}
-                      {c.avgRiskScore} · Dominant: {c.dominantRole} (
-                      {c.dominantRegion})
-                    </div>
-                    <div className="text-xs text-slate-400">
-                      Key handles: {c.topHandles.join(", ")}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Footer Insight */}
+      <div
+        style={{
+          marginTop: '30px',
+          padding: '20px',
+          background: 'rgba(0, 255, 136, 0.05)',
+          border: '1px solid rgba(0, 255, 136, 0.2)',
+          borderRadius: '12px',
+        }}
+      >
+        <h3
+          style={{
+            fontSize: '14px',
+            fontWeight: '600',
+            color: '#00ff88',
+            marginBottom: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <span>💡</span> Intelligence Insight
+        </h3>
+        <p
+          style={{
+            fontSize: '13px',
+            color: '#aaa',
+            lineHeight: '1.8',
+            margin: 0,
+          }}
+        >
+          Dashboard ini mengidentifikasi akun berisiko tinggi berdasarkan analisis
+          multi-dimensi: aktivitas posting, penggunaan bahasa ter-kodefikasi, pola
+          logistik, dan pengaruh naratif. Network graph menunjukkan koneksi antar
+          akun untuk mengidentifikasi struktur organisasi dan key players. Gunakan
+          risk score dan network role untuk memprioritaskan investigasi dan operasi
+          penindakan.
+        </p>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default AccountRiskNetwork
+export default AccountRiskNetwork;

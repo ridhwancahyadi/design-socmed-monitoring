@@ -1,19 +1,26 @@
-import React from "react"
+// src/components/Layout.jsx
+import React, { useState } from "react"
 import Sidebar from "./Sidebar"
-import Header from "./Header"
 
 const Layout = ({ children }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false)
+
   return (
-    <div className="app-shell">
-      <Sidebar />
+    <div className="min-h-screen bg-slate-900 text-slate-50">
+      {/* Sidebar fixed di kiri */}
+      <Sidebar
+        isCollapsed={isCollapsed}
+        onToggle={() => setIsCollapsed((prev) => !prev)}
+      />
 
-      <div className="app-main">
-        <Header />
-
-        <main className="app-content">
-          {children}
-        </main>
-      </div>
+      {/* Konten utama geser sesuai lebar sidebar */}
+      <main
+        className={`min-h-screen transition-all duration-300 px-6 py-6 ${
+          isCollapsed ? "ml-20" : "ml-64"
+        }`}
+      >
+        {children}
+      </main>
     </div>
   )
 }
