@@ -6,37 +6,92 @@ import AccountSearchFilters from '../components/account-risk/AccountSearchFilter
 import HighRiskAccountsTable from '../components/account-risk/HighRiskAccountsTable';
 import AccountDetailPanel from '../components/account-risk/AccountDetailPanel';
 import NetworkOverview from '../components/account-risk/NetworkOverview';
+import ForceDirectedNetwork from '../components/network/ForceDirectedNetwork';
 
 // NEW: import analytics section
 import NetworkAnalyticsSection from '../components/network/NetworkAnalyticsSection';
 
 // Helper: bentuk network nodes + clusters dari accounts
+// Helper: bentuk network nodes + clusters dari accounts
 const buildNetworkFromAccounts = (accounts) => {
   if (!accounts.length) {
-    return { nodes: [], clusters: [] };
+    return { nodes: [], clusters: [], edges: [] }
   }
 
-  // Bentuk nodes dengan metric network sintetis
-  const nodes = accounts.map((acc, index) => {
-    const degree = Math.floor(Math.random() * 10) + 1;
-    return {
-      id: acc.id ?? index + 1,
-      username: acc.username,
-      role: acc.networkRole || acc.dominantRole || 'Reseller',
-      platform: acc.platform,
-      province: acc.region,   // untuk sekarang anggap region sebagai province
-      city: acc.region,
-      riskLevel: acc.riskLevel,
-      riskScore: acc.riskScore,
-      degree,
-      betweenness: Math.random() * 10,
-      eigenvector: Math.random(),
-      cluster: (index % 5) + 1,
-    };
-  });
+  // 1) Bentuk nodes dengan metric network sintetis (degree sementara 0, nanti diisi dari edges)
+  const nodes = accounts.map((acc, index) => ({
+    id: acc.id ?? index + 1,
+    username: acc.username,
+    role: acc.networkRole || acc.dominantRole || 'Reseller',
+    platform: acc.platform,
+    province: acc.region, // untuk sekarang anggap region sebagai province
+    city: acc.region,
+    riskLevel: acc.riskLevel,
+    riskScore: acc.riskScore,
+    degree: 0, // akan diisi setelah edges dibuat
+    betweenness: Math.random() * 10,
+    eigenvector: Math.random(),
+    cluster: (index % 5) + 1,
+    // posisi untuk force-directed (0–100%)
+    x: Math.random() * 80 + 10,
+    y: Math.random() * 80 + 10,
+  }))
 
-  // Hitung cluster aggregate
-  const clusterMap = new Map();
+  // 2) Generate edges (koneksi sintetis antar akun) + isi degree
+  const edges = []
+  const edgeMap = new Set()
+
+  nodes.forEach((node, idx) => {
+    // mirip logic di contoh: role lebih tinggi → lebih banyak koneksi
+    let connectionCount
+    switch (node.role) {
+      case 'Kingpin':
+        connectionCount = 8
+        break
+      case 'Supplier':
+        connectionCount = 6
+        break
+      case 'Distributor':
+        connectionCount = 5
+        break
+      case 'Reseller':
+        connectionCount = 3
+        break
+      default:
+        connectionCount = 2
+    }
+
+    for (let i = 0; i < connectionCount; i++) {
+      const targetIdx = Math.floor(Math.random() * nodes.length)
+      if (targetIdx === idx) continue
+
+      const targetNode = nodes[targetIdx]
+      const minId = Math.min(node.id, targetNode.id)
+      const maxId = Math.max(node.id, targetNode.id)
+      const key = `${minId}-${maxId}`
+
+      if (edgeMap.has(key)) continue
+
+      edgeMap.add(key)
+
+      edges.push({
+        id: edges.length + 1,
+        source: node.id,
+        target: targetNode.id,
+        strength: Math.random(),
+        type: ['communication', 'transaction', 'recruitment'][
+          Math.floor(Math.random() * 3)
+        ],
+      })
+
+      // update degree
+      node.degree++
+      targetNode.degree++
+    }
+  })
+
+  // 3) Hitung cluster aggregate (pakai degree final untuk pilih leader)
+  const clusterMap = new Map()
   nodes.forEach((node) => {
     if (!clusterMap.has(node.cluster)) {
       clusterMap.set(node.cluster, {
@@ -46,29 +101,32 @@ const buildNetworkFromAccounts = (accounts) => {
         leader: null,
         avgRisk: 0,
         province: node.province,
-      });
+      })
     }
-    const cluster = clusterMap.get(node.cluster);
-    cluster.size += 1;
-    cluster.members.push(node.id);
-    cluster.avgRisk += node.riskScore;
-  });
+    const cluster = clusterMap.get(node.cluster)
+    cluster.size += 1
+    cluster.members.push(node.id)
+    cluster.avgRisk += node.riskScore
+  })
 
   const clusters = Array.from(clusterMap.values()).map((cluster) => {
-    cluster.avgRisk = cluster.size ? cluster.avgRisk / cluster.size : 0;
+    cluster.avgRisk = cluster.size ? cluster.avgRisk / cluster.size : 0
+
     // pilih leader: degree tertinggi di cluster
     const leaderId = cluster.members.reduce((leaderId, memberId) => {
-      const member = nodes.find((n) => n.id === memberId);
-      const currentLeader = nodes.find((n) => n.id === leaderId);
-      if (!currentLeader) return memberId;
-      return member.degree > currentLeader.degree ? memberId : leaderId;
-    }, cluster.members[0]);
-    cluster.leader = leaderId;
-    return cluster;
-  });
+      const member = nodes.find((n) => n.id === memberId)
+      const currentLeader = nodes.find((n) => n.id === leaderId)
+      if (!currentLeader) return memberId
+      return member.degree > currentLeader.degree ? memberId : leaderId
+    }, cluster.members[0])
 
-  return { nodes, clusters };
-};
+    cluster.leader = leaderId
+    return cluster
+  })
+
+  return { nodes, clusters, edges }
+}
+
 
 const AccountRiskNetwork = () => {
   const [selectedAccount, setSelectedAccount] = useState(null);
@@ -122,10 +180,12 @@ const AccountRiskNetwork = () => {
   };
 
   // === NEW: bentuk network metrics dari filtered accounts ===
-  const { nodes: networkNodes, clusters } = useMemo(
-    () => buildNetworkFromAccounts(filteredAccounts),
-    [filteredAccounts]
-  );
+  // === NEW: bentuk network metrics dari filtered accounts ===
+const { nodes: networkNodes, clusters, edges: networkEdges } = useMemo(
+  () => buildNetworkFromAccounts(filteredAccounts),
+  [filteredAccounts]
+)
+
 
   // Sinkron: klik chart → pilih account di detail
   const handleSelectNetworkNode = (node) => {
@@ -221,6 +281,12 @@ const AccountRiskNetwork = () => {
         onSelectNode={handleSelectNetworkNode}
       />
 
+      <ForceDirectedNetwork
+        nodes={networkNodes}
+        edges={networkEdges}
+        onSelectNode={handleSelectNetworkNode}
+      />
+
       {/* Footer Insight */}
       <div
         style={{
@@ -230,7 +296,8 @@ const AccountRiskNetwork = () => {
           border: '1px solid rgba(0, 255, 136, 0.2)',
           borderRadius: '12px',
         }}
-      >
+      ></div>
+
         <h3
           style={{
             fontSize: '14px',
@@ -260,7 +327,6 @@ const AccountRiskNetwork = () => {
           penindakan.
         </p>
       </div>
-    </div>
   );
 };
 
