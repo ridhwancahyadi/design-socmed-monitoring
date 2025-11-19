@@ -159,20 +159,20 @@ const RealTimeMonitoring = () => {
     },
     series: [
       {
-        name: 'Posts',
+        name: 'Video',
         type: 'bar',
         itemStyle: { color: '#3B82F6' },
         barGap: 0,
         data: realtimePlatformData.map((d) => d.video),
       },
       {
-        name: 'Stories',
+        name: 'Image',
         type: 'bar',
         itemStyle: { color: '#10B981' },
         data: realtimePlatformData.map((d) => d.image),
       },
       {
-        name: 'Reels/Videos',
+        name: 'Text',
         type: 'bar',
         itemStyle: { color: '#F59E0B' },
         data: realtimePlatformData.map((d) => d.text),
