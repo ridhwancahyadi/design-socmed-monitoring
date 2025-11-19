@@ -38,7 +38,6 @@ export const realtimeEmotionData = [
   { emotion: 'Netral', value: 45, color: '#6B7280' },
   { emotion: 'Positif', value: 32, color: '#10B981' },
   { emotion: 'Negatif', value: 15, color: '#EF4444' },
-  { emotion: 'Promosi', value: 8, color: '#F59E0B' },
 ];
 
 export const realtimePlatformData = [
