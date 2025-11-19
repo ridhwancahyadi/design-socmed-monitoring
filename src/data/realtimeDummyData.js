@@ -41,11 +41,11 @@ export const realtimeEmotionData = [
 ];
 
 export const realtimePlatformData = [
-  { platform: 'Instagram', posts: 8942, stories: 3421, reels: 2134 },
-  { platform: 'TikTok', posts: 7823, stories: 0, reels: 5621 },
-  { platform: 'Twitter/X', posts: 4532, stories: 0, reels: 0 },
-  { platform: 'Facebook', posts: 2341, stories: 891, reels: 456 },
-  { platform: 'Telegram', posts: 1209, stories: 0, reels: 0 },
+  { platform: 'Instagram', video: 8942, image: 3421, text: 2134 },
+  { platform: 'TikTok', video: 7823, image: 0, text: 5621 },
+  { platform: 'Twitter/X', video: 4532, image: 0, text: 0 },
+  { platform: 'Facebook', video: 2341, image: 891, text: 456 },
+  { platform: 'Telegram', video: 1209, image: 0, text: 0 },
 ];
 
 export const realtimeGeoData = [

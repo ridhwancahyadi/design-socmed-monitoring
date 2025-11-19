@@ -163,19 +163,19 @@ const RealTimeMonitoring = () => {
         type: 'bar',
         itemStyle: { color: '#3B82F6' },
         barGap: 0,
-        data: realtimePlatformData.map((d) => d.posts),
+        data: realtimePlatformData.map((d) => d.video),
       },
       {
         name: 'Stories',
         type: 'bar',
         itemStyle: { color: '#10B981' },
-        data: realtimePlatformData.map((d) => d.stories),
+        data: realtimePlatformData.map((d) => d.image),
       },
       {
         name: 'Reels/Videos',
         type: 'bar',
         itemStyle: { color: '#F59E0B' },
-        data: realtimePlatformData.map((d) => d.reels),
+        data: realtimePlatformData.map((d) => d.text),
       },
     ],
   };
